@@ -6,12 +6,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace mszcubemod
 {
     public class Core : MelonMod
     {
-        GameObject kiri;
         GameObject playerCamera;
         GameObject ghostCube;
         MeshRenderer ghostCubeMeshRenderer;
@@ -35,8 +35,28 @@ namespace mszcubemod
 
             InventoryManager.Instance.OnItemSelected += item =>
             {
-                if (item == null) { activeBlock = null; return; }
+                if (item == null)
+                {
+                    activeBlock = null;
+                    ghostCube?.SetActive(false);
+                    return;
+                }
                 activeBlock = blocks.FirstOrDefault(b => b.Id == item.Definition.Id);
+                if (activeBlock == null) return;
+
+                if (ghostCube == null)
+                {
+                    ghostCube = CreateCube(Vector3.zero, activeBlock.Texture, activeBlock.Size);
+                    ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
+                    ghostCubeMeshRenderer.material.color = new Color(0f, .8f, 1f, .5f);
+                    ghostCube.GetComponent<BoxCollider>().enabled = false;
+                    ghostCube.name = "cubePreview";
+                }
+                else
+                {
+                    ghostCube.SetActive(true);
+                    ghostCubeMeshRenderer.material.SetTexture("_MainTex", activeBlock.Texture);
+                }
             };
 
         }
@@ -44,34 +64,23 @@ namespace mszcubemod
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
             if (sceneName != "Version 1.9 POST") return;
-
-            kiri = GameObject.Find("Kiri");
             playerCamera = GameObject.Find("playerCamera");
-
-            if (!ghostCube)
-            {
-                ghostCube = CreateCube(new Vector3(0, 0, 0), activeBlock.Texture, DefaultCubeSize);
-                ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
-                ghostCubeMeshRenderer.material.color = new Color(0f, .8f, 1f, .5f);
-                ghostCube.GetComponent<BoxCollider>().enabled = false;
-                ghostCube.name = "cubePreview";
-            }
         }
 
         public override void OnUpdate()
         {
-            if (kiri == null) return;
+            if (playerCamera == null) return;
+            if (SceneManager.GetActiveScene().name != "Version 1.9 POST") return;
 
-            if (Input.GetMouseButtonDown(0) && activeBlock.Texture != null)
+            if (Input.GetMouseButtonDown(0) && activeBlock != null)
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
-                GameObject newCube = CreateCube(hit.point, activeBlock.Texture, DefaultCubeSize);
-                newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), DefaultCubeSize);
-                LoggerInstance.Msg(newCube.GetComponent<MeshRenderer>().material.color.a);
+                GameObject newCube = CreateCube(hit.point, activeBlock.Texture, activeBlock.Size);
+                newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
             }
             if (Input.GetMouseButtonDown(1))
-            {
+            {   
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
                 if (!hit.transform) return;
@@ -79,12 +88,12 @@ namespace mszcubemod
                 if (hitObj.name == cubeName)
                     GameObject.Destroy(hitObj);
             }
-            if (ghostCube)
+            if (ghostCube && activeBlock != null)
             {
                 if (RaycastFromCamera(out RaycastHit hit))
                 {
                     ghostCube.transform.position =
-                        SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), DefaultCubeSize);
+                        SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
                 }
             }
         }
