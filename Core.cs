@@ -78,7 +78,7 @@ namespace mszcubemod
                 GameObject newCube = CreateCube(hit.point, activeBlock.Texture, activeBlock.Size);
                 newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
             }
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && activeBlock != null)
             {   
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
