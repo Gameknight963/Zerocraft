@@ -51,6 +51,7 @@ namespace mszcubemod
             Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
             ImageConversion.LoadImage(tex, File.ReadAllBytes(texturePath));
             tex.hideFlags = HideFlags.DontUnloadUnusedAsset;
+            tex.filterMode = FilterMode.Point;
             return tex;
         }
 
