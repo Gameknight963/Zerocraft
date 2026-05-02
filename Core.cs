@@ -19,7 +19,6 @@ namespace mszcubemod
 
         List<Block>? blocks;
         Block? activeBlock;
-        readonly Dictionary<Vector3, PlacedBlock> placedBlocks = new();
 
         /// <summary>
         /// do not edit this field directly, use SetPreviewMode()
@@ -43,19 +42,6 @@ namespace mszcubemod
                 if (collider != null)
                     collider.enabled = false;
             }
-        }
-
-        void PlaceBlock(string blockId, Vector3 position)
-        {
-            if (blocks?.FirstOrDefault(b => b.Id == blockId) is not Block block) return;
-            GameObject obj = CreateCube(position, block.Texture, block.Size);
-            placedBlocks[position] = new PlacedBlock(blockId, position, obj);
-        }
-
-        void DeleteBlock(Vector3 position)
-        {
-            if (!placedBlocks.Remove(position, out PlacedBlock? placed)) return;
-            GameObject.Destroy(placed.Object);
         }
 
         public override void OnInitializeMelon()
@@ -99,7 +85,7 @@ namespace mszcubemod
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
                 Vector3 position = SnapToGrid(hit.point + Vector3.Scale(activeBlock.Size * .5f, hit.normal), activeBlock.Size);
-                PlaceBlock(activeBlock.Id, position);
+                WorldManager.Instance.PlaceBlock(activeBlock.Id, position);
             }
 
             if (Input.GetMouseButtonDown(0) && activeBlock != null)
@@ -107,7 +93,7 @@ namespace mszcubemod
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
                 if (!hit.transform) return;
                 if (hit.collider.gameObject.name != cubeName) return;
-                DeleteBlock(hit.transform.position);
+                WorldManager.Instance.DeleteBlock(hit.transform.position);
             }
 
             if (ghostCube != null && activeBlock != null)
