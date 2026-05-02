@@ -71,14 +71,14 @@ namespace mszcubemod
             if (playerCamera == null) return;
             if (SceneManager.GetActiveScene().name != "Version 1.9 POST") return;
 
-            if (Input.GetMouseButtonDown(0) && activeBlock != null)
+            if (Input.GetMouseButtonDown(1) && activeBlock != null)
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
                 GameObject newCube = CreateCube(hit.point, activeBlock.Texture, activeBlock.Size);
                 newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
             }
-            if (Input.GetMouseButtonDown(1))
+            if (Input.GetMouseButtonDown(0))
             {   
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
