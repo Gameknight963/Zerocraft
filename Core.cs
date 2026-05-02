@@ -1,7 +1,10 @@
-﻿using MelonLoader;
+﻿using InventoryFramework;
+using MelonLoader;
 using MelonLoader.Utils;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace mszcubemod
@@ -10,21 +13,32 @@ namespace mszcubemod
     {
         GameObject kiri;
         GameObject playerCamera;
-        Texture2D tex;
         GameObject ghostCube;
         MeshRenderer ghostCubeMeshRenderer;
 
         public static Vector3 DefaultCubeSize => new Vector3(0.5f, 0.5f, 0.5f);
-
         public static readonly string ModResources = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft");
-
-        private readonly string texturePath = Path.Combine(ModResources, "plank.jpg");
-
         const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
+
+        List<Block> blocks;
+        Block activeBlock;
 
         public override void OnInitializeMelon()
         {
-            BlockLoader.LoadAll();
+            blocks = BlockLoader.LoadAll();
+
+            foreach (Block block in blocks)
+            {
+                Sprite sprite = Sprite.Create(block.Texture, new Rect(0, 0, block.Texture.width, block.Texture.height), new Vector2(0.5f, 0.5f));
+                InventoryManager.Instance.RegisterItem(new ItemDefinition(block.Id, block.Name, sprite));
+            }
+
+            InventoryManager.Instance.OnItemSelected += item =>
+            {
+                if (item == null) { activeBlock = null; return; }
+                activeBlock = blocks.FirstOrDefault(b => b.Id == item.Definition.Id);
+            };
+
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -34,14 +48,9 @@ namespace mszcubemod
             kiri = GameObject.Find("Kiri");
             playerCamera = GameObject.Find("playerCamera");
 
-            byte[] fileData = File.ReadAllBytes(texturePath);
-            tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-            ImageConversion.LoadImage(tex, fileData);
-            tex.hideFlags = HideFlags.DontUnloadUnusedAsset;
-
             if (!ghostCube)
             {
-                ghostCube = CreateCube(new Vector3(0, 0, 0), tex, DefaultCubeSize);
+                ghostCube = CreateCube(new Vector3(0, 0, 0), activeBlock.Texture, DefaultCubeSize);
                 ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
                 ghostCubeMeshRenderer.material.color = new Color(0f, .8f, 1f, .5f);
                 ghostCube.GetComponent<BoxCollider>().enabled = false;
@@ -53,11 +62,11 @@ namespace mszcubemod
         {
             if (kiri == null) return;
 
-            if (Input.GetMouseButtonDown(0) && tex != null)
+            if (Input.GetMouseButtonDown(0) && activeBlock.Texture != null)
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
-                GameObject newCube = CreateCube(hit.point, tex, DefaultCubeSize);
+                GameObject newCube = CreateCube(hit.point, activeBlock.Texture, DefaultCubeSize);
                 newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), DefaultCubeSize);
                 LoggerInstance.Msg(newCube.GetComponent<MeshRenderer>().material.color.a);
             }
