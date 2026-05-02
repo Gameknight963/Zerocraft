@@ -1,14 +1,13 @@
 ﻿using MelonLoader;
 using mszcubemod;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("mszcubemod")]
-[assembly: MelonInfo(typeof(Cube), "ZeroCraft", "2.1.0", "gameknight963")]
+[assembly: AssemblyTitle("Zerocraft")]
+[assembly: MelonInfo(typeof(Core), "Zerocraft", "3.0.0", "gameknight963")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
