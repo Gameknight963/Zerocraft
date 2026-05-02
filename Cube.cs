@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace mszcubemod
 {
-    public class Cube : MelonMod
+    public class Core : MelonMod
     {
         GameObject kiri;
         GameObject playerCamera;
@@ -18,7 +18,7 @@ namespace mszcubemod
         const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
         public override void OnInitializeMelon()
         {
-            texturePath = Path.Combine(MelonEnvironment.ModsDirectory, "Images", "plank.jpg");
+            texturePath = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft", "plank.jpg");
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
