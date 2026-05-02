@@ -1,9 +1,6 @@
 ﻿using InventoryFramework;
 using MelonLoader;
 using MelonLoader.Utils;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -20,7 +17,6 @@ namespace mszcubemod
 
         List<Block>? blocks;
         Block? activeBlock;
-
 
         /// <summary>
         /// do not edit this field directly, use SetPreviewMode()
@@ -39,7 +35,11 @@ namespace mszcubemod
                 : CreateWireframeCube(Vector3.zero, activeBlock.Size);
             ghostCube.SetActive(false);
             if (!_previewMode)
-                ghostCube.GetComponent<BoxCollider>().enabled = false;
+            {
+                BoxCollider? collider = ghostCube.GetComponent<BoxCollider>();
+                if (collider != null)
+                    collider.enabled = false;
+            }
         }
 
         public override void OnInitializeMelon()
@@ -60,24 +60,12 @@ namespace mszcubemod
                     ghostCube?.SetActive(false);
                     return;
                 }
+
                 activeBlock = blocks.FirstOrDefault(b => b.Id == item.Definition.Id);
                 if (activeBlock == null) return;
 
-                MeshRenderer ghostCubeMeshRenderer;
-
-                if (ghostCube == null)
-                {
-                    ghostCube = CreateWireframeCube(Vector3.zero, activeBlock.Size);
-                    ghostCube.SetActive(false);
-                }
-                else
-                {
-                    ghostCube.SetActive(true);
-                    ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
-                    ghostCubeMeshRenderer.material.SetTexture("_MainTex", activeBlock.Texture);
-                }
+                SetPreviewMode(_previewMode);
             };
-
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
@@ -122,8 +110,6 @@ namespace mszcubemod
                         if (hit.transform.gameObject.name != cubeName) return;
                         ghostCube.transform.position = hit.transform.position;
                     }
-                    ghostCube!.transform.position =
-                        SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
                 }
                 else ghostCube.SetActive(false);
             }
