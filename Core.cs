@@ -17,7 +17,6 @@ namespace mszcubemod
         public static readonly string ModResources = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft");
         const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
 
-        List<Block>? blocks;
         Block? activeBlock;
 
         /// <summary>
@@ -46,9 +45,9 @@ namespace mszcubemod
 
         public override void OnInitializeMelon()
         {
-            blocks = BlockLoader.LoadAll();
+            WorldManager.Instance.Initialize(BlockLoader.LoadAll());
 
-            foreach (Block block in blocks)
+            foreach (Block block in WorldManager.Instance.Blocks)
             {
                 Sprite sprite = Sprite.Create(block.Texture, new Rect(0, 0, block.Texture.width, block.Texture.height), new Vector2(0.5f, 0.5f));
                 InventoryManager.Instance.RegisterItem(new ItemDefinition(block.Id, block.Name, sprite));
@@ -63,7 +62,7 @@ namespace mszcubemod
                     return;
                 }
 
-                activeBlock = blocks.FirstOrDefault(b => b.Id == item.Definition.Id);
+                activeBlock = WorldManager.Instance.Blocks.FirstOrDefault(b => b.Id == item.Definition.Id);
                 if (activeBlock == null) return;
 
                 SetPreviewMode(_previewMode);
