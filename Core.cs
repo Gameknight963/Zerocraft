@@ -6,6 +6,8 @@ using UnityEngine.SceneManagement;
 
 namespace mszcubemod
 {
+    record PlacedBlock(string BlockId, Vector3 Position, GameObject Object);
+
     public class Core : MelonMod
     {
         GameObject? playerCamera;
@@ -17,6 +19,7 @@ namespace mszcubemod
 
         List<Block>? blocks;
         Block? activeBlock;
+        readonly Dictionary<Vector3, PlacedBlock> placedBlocks = new();
 
         /// <summary>
         /// do not edit this field directly, use SetPreviewMode()
@@ -40,6 +43,19 @@ namespace mszcubemod
                 if (collider != null)
                     collider.enabled = false;
             }
+        }
+
+        void PlaceBlock(string blockId, Vector3 position)
+        {
+            if (blocks?.FirstOrDefault(b => b.Id == blockId) is not Block block) return;
+            GameObject obj = CreateCube(position, block.Texture, block.Size);
+            placedBlocks[position] = new PlacedBlock(blockId, position, obj);
+        }
+
+        void DeleteBlock(Vector3 position)
+        {
+            if (!placedBlocks.Remove(position, out PlacedBlock? placed)) return;
+            GameObject.Destroy(placed.Object);
         }
 
         public override void OnInitializeMelon()
@@ -82,19 +98,18 @@ namespace mszcubemod
             if (Input.GetMouseButtonDown(1) && activeBlock != null)
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
-
-                GameObject newCube = CreateCube(hit.point, activeBlock.Texture, activeBlock.Size);
-                newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
+                Vector3 position = SnapToGrid(hit.point + Vector3.Scale(activeBlock.Size * .5f, hit.normal), activeBlock.Size);
+                PlaceBlock(activeBlock.Id, position);
             }
+
             if (Input.GetMouseButtonDown(0) && activeBlock != null)
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
-
                 if (!hit.transform) return;
-                GameObject hitObj = hit.collider.gameObject;
-                if (hitObj.name == cubeName)
-                    GameObject.Destroy(hitObj);
+                if (hit.collider.gameObject.name != cubeName) return;
+                DeleteBlock(hit.transform.position);
             }
+
             if (ghostCube != null && activeBlock != null)
             {
                 if (RaycastFromCamera(out RaycastHit hit))
@@ -114,35 +129,33 @@ namespace mszcubemod
                 else ghostCube.SetActive(false);
             }
         }
+
         public bool RaycastFromCamera(out RaycastHit hit)
         {
             if (playerCamera is null) throw new InvalidOperationException();
             Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
             return Physics.Raycast(ray, out hit, 4f);
         }
-        public static GameObject CreateCube(Vector3 positon, Texture2D texture, Vector3 scale)
+
+        public static GameObject CreateCube(Vector3 position, Texture2D texture, Vector3 scale)
         {
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
-            cube.transform.position = positon;
+            cube.transform.position = position;
             cube.transform.localScale = scale;
             cube.name = cubeName;
             MeshRenderer renderer = cube.GetComponent<MeshRenderer>();
-
-            Shader shader = Shader.Find("Standard");
-
-            Material mat = new(shader);
+            Material mat = new(Shader.Find("Standard"));
             mat.SetTexture("_MainTex", texture);
-
             renderer.material = mat;
             return cube;
         }
+
         public static Vector3 SnapToGrid(Vector3 position, Vector3 snapGrid)
         {
-            Vector3 snapped = new(
+            return new Vector3(
                 Mathf.Round(position.x / snapGrid.x) * snapGrid.x,
                 Mathf.Round(position.y / snapGrid.y) * snapGrid.y,
                 Mathf.Round(position.z / snapGrid.z) * snapGrid.z);
-            return snapped;
         }
 
         public GameObject CreateWireframeCube(Vector3 position, Vector3 size)
@@ -161,9 +174,9 @@ namespace mszcubemod
 
             int[][] edges = new int[][]
             {
-        new[]{0,1}, new[]{1,2}, new[]{2,3}, new[]{3,0},
-        new[]{4,5}, new[]{5,6}, new[]{6,7}, new[]{7,4},
-        new[]{0,4}, new[]{1,5}, new[]{2,6}, new[]{3,7},
+                new[]{0,1}, new[]{1,2}, new[]{2,3}, new[]{3,0},
+                new[]{4,5}, new[]{5,6}, new[]{6,7}, new[]{7,4},
+                new[]{0,4}, new[]{1,5}, new[]{2,6}, new[]{3,7},
             };
 
             Material mat = new(Shader.Find("Unlit/Color"));
