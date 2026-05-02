@@ -14,9 +14,8 @@ namespace mszcubemod
     {
         GameObject playerCamera;
         GameObject ghostCube;
-        MeshRenderer ghostCubeMeshRenderer;
 
-        public static Vector3 DefaultCubeSize => new Vector3(0.5f, 0.5f, 0.5f);
+        public static Vector3 DefaultCubeSize => new Vector3(1f, 1f, 1f);
         public static readonly string ModResources = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft");
         const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
 
@@ -47,7 +46,7 @@ namespace mszcubemod
                 if (ghostCube == null)
                 {
                     ghostCube = CreateCube(Vector3.zero, activeBlock.Texture, activeBlock.Size);
-                    ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
+                    MeshRenderer ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
                     ghostCubeMeshRenderer.material.color = new Color(0f, .8f, 1f, .5f);
                     ghostCube.GetComponent<BoxCollider>().enabled = false;
                     ghostCube.name = "cubePreview";
@@ -55,7 +54,7 @@ namespace mszcubemod
                 else
                 {
                     ghostCube.SetActive(true);
-                    ghostCubeMeshRenderer.material.SetTexture("_MainTex", activeBlock.Texture);
+                    ghostCube.GetComponent<MeshRenderer>().material.SetTexture("_MainTex", activeBlock.Texture);
                 }
             };
 
