@@ -10,7 +10,7 @@ namespace mszcubemod
     {
         public static List<Block> LoadAll()
         {
-            List<Block> blocks = new List<Block>();
+            List<Block> blocks = new();
 
             foreach (string filePath in Directory.GetFiles(Core.ModResources))
             {
@@ -24,7 +24,7 @@ namespace mszcubemod
             {
                 string texturePath = Directory.GetFiles(dir, "*.png")
                     .Concat(Directory.GetFiles(dir, "*.jpg"))
-                    .FirstOrDefault();
+                    .First();
                 if (texturePath == null) continue;
 
                 string dirName = Path.GetFileName(dir);
@@ -32,7 +32,8 @@ namespace mszcubemod
 
                 if (File.Exists(jsonPath))
                 {
-                    Block data = JsonConvert.DeserializeObject<Block>(File.ReadAllText(jsonPath));
+                    Block? data = JsonConvert.DeserializeObject<Block>(File.ReadAllText(jsonPath)) 
+                        ?? throw new InvalidOperationException($"{jsonPath} is malformed or invalid");
                     if (string.IsNullOrEmpty(data.Name)) throw new FormatException($"{jsonPath}: Block name is malformed");
                     if (data.Size == default) throw new FormatException($"{jsonPath}: Block size is malformed");
                     Block block = new Block(dirName, data.Name, texturePath, data.Size);

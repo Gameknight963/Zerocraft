@@ -12,16 +12,15 @@ namespace mszcubemod
 {
     public class Core : MelonMod
     {
-        GameObject playerCamera;
-        GameObject ghostCube;
-        MeshRenderer ghostCubeMeshRenderer;
+        GameObject? playerCamera;
+        GameObject? ghostCube;
 
         public static Vector3 DefaultCubeSize => new Vector3(0.5f, 0.5f, 0.5f);
         public static readonly string ModResources = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft");
         const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
 
-        List<Block> blocks;
-        Block activeBlock;
+        List<Block>? blocks;
+        Block? activeBlock;
 
         public override void OnInitializeMelon()
         {
@@ -44,6 +43,8 @@ namespace mszcubemod
                 activeBlock = blocks.FirstOrDefault(b => b.Id == item.Definition.Id);
                 if (activeBlock == null) return;
 
+                MeshRenderer ghostCubeMeshRenderer;
+
                 if (ghostCube == null)
                 {
                     ghostCube = CreateCube(Vector3.zero, activeBlock.Texture, activeBlock.Size);
@@ -55,6 +56,7 @@ namespace mszcubemod
                 else
                 {
                     ghostCube.SetActive(true);
+                    ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
                     ghostCubeMeshRenderer.material.SetTexture("_MainTex", activeBlock.Texture);
                 }
             };
@@ -92,17 +94,18 @@ namespace mszcubemod
             {
                 if (RaycastFromCamera(out RaycastHit hit))
                 {
-                    ghostCube.transform.position =
+                    ghostCube!.transform.position =
                         SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
                 }
             }
         }
         public bool RaycastFromCamera(out RaycastHit hit)
         {
+            if (playerCamera is null) throw new InvalidOperationException();
             Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
             return Physics.Raycast(ray, out hit, 4f);
         }
-        public GameObject CreateCube(Vector3 positon, Texture2D texture, Vector3 scale)
+        public static GameObject CreateCube(Vector3 positon, Texture2D texture, Vector3 scale)
         {
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.position = positon;
@@ -111,17 +114,16 @@ namespace mszcubemod
             MeshRenderer renderer = cube.GetComponent<MeshRenderer>();
 
             Shader shader = Shader.Find("Standard");
-            if (shader == null) return null;
 
-            Material mat = new Material(shader);
+            Material mat = new(shader);
             mat.SetTexture("_MainTex", texture);
 
             renderer.material = mat;
             return cube;
         }
-        public Vector3 SnapToGrid(Vector3 position, Vector3 snapGrid)
+        public static Vector3 SnapToGrid(Vector3 position, Vector3 snapGrid)
         {
-            Vector3 snapped = new Vector3(
+            Vector3 snapped = new(
                 Mathf.Round(position.x / snapGrid.x) * snapGrid.x,
                 Mathf.Round(position.y / snapGrid.y) * snapGrid.y,
                 Mathf.Round(position.z / snapGrid.z) * snapGrid.z);
