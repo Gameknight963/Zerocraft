@@ -1,7 +1,6 @@
 ﻿using InventoryFramework;
 using MelonLoader;
 using MelonLoader.Utils;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -15,12 +14,33 @@ namespace mszcubemod
         GameObject? playerCamera;
         GameObject? ghostCube;
 
-        public static Vector3 DefaultCubeSize => new Vector3(0.5f, 0.5f, 0.5f);
+        public static Vector3 DefaultCubeSize => new(1f, 1f, 1f);
         public static readonly string ModResources = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft");
         const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
 
         List<Block>? blocks;
         Block? activeBlock;
+
+
+        /// <summary>
+        /// do not edit this field directly, use SetPreviewMode()
+        /// </summary>
+        bool _previewMode = false;
+
+        /// <param name="preview">true for ghost preview, false for wireframe</param>
+        void SetPreviewMode(bool preview)
+        {
+            _previewMode = preview;
+            if (ghostCube != null)
+                UnityEngine.Object.Destroy(ghostCube);
+            if (activeBlock == null) return;
+            ghostCube = _previewMode
+                ? CreateCube(Vector3.zero, activeBlock.Texture, activeBlock.Size)
+                : CreateWireframeCube(Vector3.zero, activeBlock.Size);
+            ghostCube.SetActive(false);
+            if (!_previewMode)
+                ghostCube.GetComponent<BoxCollider>().enabled = false;
+        }
 
         public override void OnInitializeMelon()
         {
@@ -47,11 +67,8 @@ namespace mszcubemod
 
                 if (ghostCube == null)
                 {
-                    ghostCube = CreateCube(Vector3.zero, activeBlock.Texture, activeBlock.Size);
-                    ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
-                    ghostCubeMeshRenderer.material.color = new Color(0f, .8f, 1f, .5f);
-                    ghostCube.GetComponent<BoxCollider>().enabled = false;
-                    ghostCube.name = "cubePreview";
+                    ghostCube = CreateWireframeCube(Vector3.zero, activeBlock.Size);
+                    ghostCube.SetActive(false);
                 }
                 else
                 {
@@ -74,15 +91,15 @@ namespace mszcubemod
             if (playerCamera == null) return;
             if (SceneManager.GetActiveScene().name != "Version 1.9 POST") return;
 
-            if (Input.GetMouseButtonDown(0) && activeBlock != null)
+            if (Input.GetMouseButtonDown(1) && activeBlock != null)
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
                 GameObject newCube = CreateCube(hit.point, activeBlock.Texture, activeBlock.Size);
                 newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
             }
-            if (Input.GetMouseButtonDown(1))
-            {   
+            if (Input.GetMouseButtonDown(0) && activeBlock != null)
+            {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
                 if (!hit.transform) return;
@@ -90,13 +107,25 @@ namespace mszcubemod
                 if (hitObj.name == cubeName)
                     GameObject.Destroy(hitObj);
             }
-            if (ghostCube && activeBlock != null)
+            if (ghostCube != null && activeBlock != null)
             {
                 if (RaycastFromCamera(out RaycastHit hit))
                 {
+                    ghostCube.SetActive(true);
+                    if (_previewMode)
+                    {
+                        ghostCube.transform.position =
+                            SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
+                    }
+                    else
+                    {
+                        if (hit.transform.gameObject.name != cubeName) return;
+                        ghostCube.transform.position = hit.transform.position;
+                    }
                     ghostCube!.transform.position =
                         SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), activeBlock.Size);
                 }
+                else ghostCube.SetActive(false);
             }
         }
         public bool RaycastFromCamera(out RaycastHit hit)
@@ -128,6 +157,47 @@ namespace mszcubemod
                 Mathf.Round(position.y / snapGrid.y) * snapGrid.y,
                 Mathf.Round(position.z / snapGrid.z) * snapGrid.z);
             return snapped;
+        }
+
+        public GameObject CreateWireframeCube(Vector3 position, Vector3 size)
+        {
+            GameObject obj = new GameObject("cubePreview");
+            obj.transform.position = position;
+
+            Vector3 h = size * 0.5f;
+            Vector3[] corners = new Vector3[]
+            {
+                new Vector3(-h.x, -h.y, -h.z), new Vector3( h.x, -h.y, -h.z),
+                new Vector3( h.x,  h.y, -h.z), new Vector3(-h.x,  h.y, -h.z),
+                new Vector3(-h.x, -h.y,  h.z), new Vector3( h.x, -h.y,  h.z),
+                new Vector3( h.x,  h.y,  h.z), new Vector3(-h.x,  h.y,  h.z),
+            };
+
+            int[][] edges = new int[][]
+            {
+        new[]{0,1}, new[]{1,2}, new[]{2,3}, new[]{3,0},
+        new[]{4,5}, new[]{5,6}, new[]{6,7}, new[]{7,4},
+        new[]{0,4}, new[]{1,5}, new[]{2,6}, new[]{3,7},
+            };
+
+            Material mat = new(Shader.Find("Unlit/Color"));
+            mat.color = Color.black;
+
+            foreach (int[] edge in edges)
+            {
+                GameObject line = new GameObject("Edge");
+                line.transform.SetParent(obj.transform, false);
+                LineRenderer lr = line.AddComponent<LineRenderer>();
+                lr.positionCount = 2;
+                lr.SetPosition(0, corners[edge[0]]);
+                lr.SetPosition(1, corners[edge[1]]);
+                lr.startWidth = 0.02f;
+                lr.endWidth = 0.02f;
+                lr.material = mat;
+                lr.useWorldSpace = false;
+            }
+
+            return obj;
         }
     }
 }
