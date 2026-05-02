@@ -8,7 +8,11 @@ namespace mszcubemod
     {
         public override Vector3 ReadJson(JsonReader reader, Type objectType, Vector3 existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
-            float[] arr = serializer.Deserialize<float[]>(reader);
+            float[]? arr = serializer.Deserialize<float[]>(reader);
+
+            if (arr is not { Length: 3 })
+                throw new JsonSerializationException($"Expected a float array with 3 elements, got {arr?.Length.ToString() ?? "null"}.");
+
             return new Vector3(arr[0], arr[1], arr[2]);
         }
 
