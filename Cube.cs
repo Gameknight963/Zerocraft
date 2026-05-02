@@ -1,14 +1,7 @@
-﻿using Il2Cpp;
-using MelonLoader;
-using System;
-using System.Collections.Generic;
+﻿using MelonLoader;
+using MelonLoader.Utils;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using UnityEngine;
-using UnityEngine.SceneManagement;
-using static Il2CppRootMotion.FinalIK.GenericPoser;
 
 namespace mszcubemod
 {
@@ -16,37 +9,31 @@ namespace mszcubemod
     {
         GameObject kiri;
         GameObject playerCamera;
-        string gameRootDirectory = Directory.GetCurrentDirectory();
         string texturePath;
         Texture2D tex;
         GameObject ghostCube;
         MeshRenderer ghostCubeMeshRenderer;
         Vector3 cubeSize = new Vector3(.5f, .5f, .5f);
+
+        const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
         public override void OnInitializeMelon()
         {
-            texturePath = Path.Combine(gameRootDirectory, "Mods", "Images", "plank.jpg");
+            texturePath = Path.Combine(MelonEnvironment.ModsDirectory, "Images", "plank.jpg");
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
 
-            if (sceneName != "Version 1.9 POST")
-            {
-                return;
-            }
+            if (sceneName != "Version 1.9 POST") return;
+
             kiri = GameObject.Find("Kiri");
             playerCamera = GameObject.Find("playerCamera");
 
             byte[] fileData = File.ReadAllBytes(texturePath);
             tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
-            bool success = ImageConversion.LoadImage(tex, fileData);
+            ImageConversion.LoadImage(tex, fileData);
+            tex.hideFlags = HideFlags.DontUnloadUnusedAsset;
 
-            if (success)
-            {
-                tex.name = "CustomCatTexture";
-                tex.hideFlags = HideFlags.DontUnloadUnusedAsset;
-                LoggerInstance.Msg("[DEBUG] loaded fuck yes");
-            }
             if (!ghostCube)
             {
                 ghostCube = CreateCube(new Vector3(0, 0, 0), tex, cubeSize);
@@ -59,70 +46,62 @@ namespace mszcubemod
 
         public override void OnUpdate()
         {
-            if (kiri == null) { return; }
+            if (kiri == null) return;
+
             if (Input.GetMouseButtonDown(0) && tex != null)
             {
-                RaycastHit hit = RaycastFromCamera();
-                GameObject newCube =  CreateCube(hit.point, tex, cubeSize);
-                newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal));
+                if (!RaycastFromCamera(out RaycastHit hit)) return;
+
+                GameObject newCube = CreateCube(hit.point, tex, cubeSize);
+                newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), cubeSize);
                 LoggerInstance.Msg(newCube.GetComponent<MeshRenderer>().material.color.a);
             }
             if (Input.GetMouseButtonDown(1))
             {
-                RaycastHit hit = RaycastFromCamera();
-                if (hit.transform)
-                {
-                    GameObject hitObj = hit.collider.gameObject;
-                    if (hitObj.name == "cube-2guyfhgweybvgfijbneurnbv")
-                    {
-                        GameObject.Destroy(hitObj);
-                    }
-                }
+                if (!RaycastFromCamera(out RaycastHit hit)) return;
+
+                if (!hit.transform) return;
+                GameObject hitObj = hit.collider.gameObject;
+                if (hitObj.name == cubeName)
+                    GameObject.Destroy(hitObj);
             }
             if (ghostCube)
             {
-                RaycastHit hit = RaycastFromCamera();
-                ghostCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal));
+                if (RaycastFromCamera(out RaycastHit hit))
+                {
+                    ghostCube.transform.position =
+                        SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), cubeSize);
+                }
             }
         }
-        public RaycastHit RaycastFromCamera()
+        public bool RaycastFromCamera(out RaycastHit hit)
         {
             Ray ray = new Ray(playerCamera.transform.position, playerCamera.transform.forward);
-            if (!Physics.Raycast(ray, out RaycastHit hit, 4f))
-            {
-                //yes this is the way im checking if it hit or not. i hate structs
-                hit.point = new Vector3(6969, 6969, 6969);
-            }
-            return hit;
+            return Physics.Raycast(ray, out hit, 4f);
         }
         public GameObject CreateCube(Vector3 positon, Texture2D texture, Vector3 scale)
         {
             GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
             cube.transform.position = positon;
             cube.transform.localScale = scale;
-            cube.name = "cube-2guyfhgweybvgfijbneurnbv";
+            cube.name = cubeName;
             MeshRenderer renderer = cube.GetComponent<MeshRenderer>();
 
             Shader shader = Shader.Find("Standard");
-            if (shader == null)
-            {
-                return null;
-            }
+            if (shader == null) return null;
 
             Material mat = new Material(shader);
             mat.SetTexture("_MainTex", texture);
 
             renderer.material = mat;
-
-            renderer.material = mat;
             return cube;
         }
-        public Vector3 SnapToGrid(Vector3 position)
+        public Vector3 SnapToGrid(Vector3 position, Vector3 snapGrid)
         {
             Vector3 snapped = new Vector3(
-                Mathf.Round(position.x / cubeSize.x) * cubeSize.x,
-                Mathf.Round(position.y / cubeSize.y) * cubeSize.y,
-                Mathf.Round(position.z / cubeSize.z) * cubeSize.z);
+                Mathf.Round(position.x / snapGrid.x) * snapGrid.x,
+                Mathf.Round(position.y / snapGrid.y) * snapGrid.y,
+                Mathf.Round(position.z / snapGrid.z) * snapGrid.z);
             return snapped;
         }
     }
