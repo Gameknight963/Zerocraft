@@ -1,29 +1,34 @@
 ﻿using MelonLoader;
 using MelonLoader.Utils;
+using Newtonsoft.Json;
 using System.IO;
 using UnityEngine;
 
 namespace mszcubemod
 {
-    public class Mszcubemod : MelonMod
+    public class Core : MelonMod
     {
         GameObject kiri;
         GameObject playerCamera;
-        string texturePath;
         Texture2D tex;
         GameObject ghostCube;
         MeshRenderer ghostCubeMeshRenderer;
-        Vector3 cubeSize = new Vector3(.5f, .5f, .5f);
+
+        public static Vector3 DefaultCubeSize => new Vector3(0.5f, 0.5f, 0.5f);
+
+        public static readonly string ModResources = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft");
+
+        private readonly string texturePath = Path.Combine(ModResources, "plank.jpg");
 
         const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
+
         public override void OnInitializeMelon()
         {
-            texturePath = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft", "plank.jpg");
+            BlockLoader.LoadAll();
         }
 
         public override void OnSceneWasLoaded(int buildIndex, string sceneName)
         {
-
             if (sceneName != "Version 1.9 POST") return;
 
             kiri = GameObject.Find("Kiri");
@@ -36,7 +41,7 @@ namespace mszcubemod
 
             if (!ghostCube)
             {
-                ghostCube = CreateCube(new Vector3(0, 0, 0), tex, cubeSize);
+                ghostCube = CreateCube(new Vector3(0, 0, 0), tex, DefaultCubeSize);
                 ghostCubeMeshRenderer = ghostCube.GetComponent<MeshRenderer>();
                 ghostCubeMeshRenderer.material.color = new Color(0f, .8f, 1f, .5f);
                 ghostCube.GetComponent<BoxCollider>().enabled = false;
@@ -52,8 +57,8 @@ namespace mszcubemod
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
 
-                GameObject newCube = CreateCube(hit.point, tex, cubeSize);
-                newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), cubeSize);
+                GameObject newCube = CreateCube(hit.point, tex, DefaultCubeSize);
+                newCube.transform.position = SnapToGrid(hit.point + Vector3.Scale(newCube.transform.localScale * .5f, hit.normal), DefaultCubeSize);
                 LoggerInstance.Msg(newCube.GetComponent<MeshRenderer>().material.color.a);
             }
             if (Input.GetMouseButtonDown(1))
@@ -70,7 +75,7 @@ namespace mszcubemod
                 if (RaycastFromCamera(out RaycastHit hit))
                 {
                     ghostCube.transform.position =
-                        SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), cubeSize);
+                        SnapToGrid(hit.point + Vector3.Scale(ghostCube.transform.localScale * .5f, hit.normal), DefaultCubeSize);
                 }
             }
         }
