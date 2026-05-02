@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace mszcubemod
 {
-    public class Core : MelonMod
+    public class Mszcubemod : MelonMod
     {
         GameObject kiri;
         GameObject playerCamera;

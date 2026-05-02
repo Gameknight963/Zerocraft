@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Zerocraft")]
-[assembly: MelonInfo(typeof(Core), "Zerocraft", "3.0.0", "gameknight963")]
+[assembly: MelonInfo(typeof(mszcubemod.mszcubemod), "Zerocraft", "3.0.0", "gameknight963")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
