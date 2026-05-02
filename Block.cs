@@ -15,12 +15,13 @@ namespace mszcubemod
         public Texture2D Texture { get; private set; }
 
         [JsonIgnore]
-        public string TexturePath { get; set; }
+        public string TexturePath { get; init; }
 
         public Block(string id, string name, string texturePath, Vector3 size)
         {
             ThrowIfTexturePathIsInvalid(texturePath);
             Texture = LoadTexture(texturePath);
+            TexturePath = texturePath;
             Id = id;
             Name = name;
             Size = size;
@@ -29,6 +30,7 @@ namespace mszcubemod
         public Block(string id, string name, string texturePath)
         {
             ThrowIfTexturePathIsInvalid(texturePath);
+            TexturePath = texturePath;
             Texture = LoadTexture(texturePath);
             Id = id;
             Name = name;
@@ -43,19 +45,19 @@ namespace mszcubemod
         {
             ThrowIfTexturePathIsInvalid(texturePath);
             Texture = LoadTexture(texturePath);
+            TexturePath = texturePath;
         }
 
-        private Texture2D LoadTexture(string texturePath)
+        private static Texture2D LoadTexture(string texturePath)
         {
-            TexturePath = texturePath;
-            Texture2D tex = new Texture2D(2, 2, TextureFormat.RGBA32, false);
+            Texture2D tex = new(2, 2, TextureFormat.RGBA32, false);
             ImageConversion.LoadImage(tex, File.ReadAllBytes(texturePath));
             tex.hideFlags = HideFlags.DontUnloadUnusedAsset;
             tex.filterMode = FilterMode.Point;
             return tex;
         }
 
-        private void ThrowIfTexturePathIsInvalid(string texturePath)
+        private static void ThrowIfTexturePathIsInvalid(string texturePath)
         {
             if (!File.Exists(texturePath)) throw new FileNotFoundException($"{texturePath}: No such file");
             if (!texturePath.EndsWith(".jpg") && !texturePath.EndsWith(".png"))
