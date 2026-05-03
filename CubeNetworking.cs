@@ -1,6 +1,6 @@
 ﻿using MultiSide.shared;
-using UnityEngine;
 using Photon.Client;
+using UnityEngine;
 
 namespace mszcubemod
 {
@@ -37,7 +37,7 @@ namespace mszcubemod
         void Subscribe(INetworkProvider provider)
         {
             provider.OnReceived += OnReceived;
-            provider.OnPlayerJoined += OnPlayerJoined;
+            provider.OnRoomJoined += OnRoomJoined;
         }
 
         void OnReceived(int actor, string channel, object data)
@@ -57,6 +57,11 @@ namespace mszcubemod
                     HandleWorldStateResponse(blocks);
                     break;
             }
+        }
+
+        void OnRoomJoined()
+        {
+            NetworkRegistry.Provider?.Send(ChannelWorldStateRequest, new PhotonHashtable());
         }
 
         void HandlePlace(PhotonHashtable ht)
@@ -96,11 +101,6 @@ namespace mszcubemod
                 if (ht["position"] is not Vector3 position) continue;
                 WorldManager.Instance.PlaceBlock(blockId, position);
             }
-        }
-
-        void OnPlayerJoined(int actor)
-        {
-            NetworkRegistry.Provider?.Send(ChannelWorldStateRequest, new PhotonHashtable());
         }
 
         public void SendPlace(string blockId, Vector3 position)
