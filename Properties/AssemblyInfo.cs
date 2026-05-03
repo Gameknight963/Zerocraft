@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 [assembly: AssemblyTitle("Zerocraft")]
 [assembly: MelonInfo(typeof(mszcubemod.Core), "Zerocraft", "3.0.0", "gameknight963")]
+[assembly: MelonOptionalDependencies("Multiside.shared", "PhotonClient")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
