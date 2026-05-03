@@ -43,9 +43,22 @@ namespace mszcubemod
             }
         }
 
+        static void PlaceBlock(string blockId, Vector3 position)
+        {
+            WorldManager.Instance.PlaceBlock(blockId, position);
+            CubeNetworking.Instance?.SendPlace(blockId, position);
+        }
+
+        static void DeleteBlock(Vector3 position)
+        {
+            WorldManager.Instance.DeleteBlock(position);
+            CubeNetworking.Instance?.SendDelete(position);
+        }
+
         public override void OnInitializeMelon()
         {
             WorldManager.Instance.Initialize(BlockLoader.LoadAll());
+            CubeNetworking.Init();
 
             foreach (Block block in WorldManager.Instance.Blocks)
             {
@@ -84,7 +97,7 @@ namespace mszcubemod
             {
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
                 Vector3 position = SnapToGrid(hit.point + Vector3.Scale(activeBlock.Size * .5f, hit.normal), activeBlock.Size);
-                WorldManager.Instance.PlaceBlock(activeBlock.Id, position);
+                PlaceBlock(activeBlock.Id, position);
             }
 
             if (Input.GetMouseButtonDown(0) && activeBlock != null)
@@ -92,7 +105,7 @@ namespace mszcubemod
                 if (!RaycastFromCamera(out RaycastHit hit)) return;
                 if (!hit.transform) return;
                 if (hit.collider.gameObject.name != cubeName) return;
-                WorldManager.Instance.DeleteBlock(hit.transform.position);
+                DeleteBlock(hit.transform.position);
             }
 
             if (ghostCube != null && activeBlock != null)

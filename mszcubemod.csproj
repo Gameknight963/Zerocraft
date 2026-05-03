@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -34,6 +34,12 @@
     </Reference>
     <Reference Include="MelonLoader">
       <HintPath>dependencies\melonloader assemblies\MelonLoader.dll</HintPath>
+    </Reference>
+    <Reference Include="Multiside.shared">
+      <HintPath>dependencies\Multiside.shared.dll</HintPath>
+    </Reference>
+    <Reference Include="PhotonClient">
+      <HintPath>dependencies\PhotonClient.dll</HintPath>
     </Reference>
     <Reference Include="UnityEngine">
       <HintPath>dependencies\unity assemblies\UnityEngine.dll</HintPath>
