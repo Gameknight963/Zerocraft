@@ -15,11 +15,5 @@ namespace mszcubemod
         public Texture2D Back => _texture;
         public Texture2D Left => _texture;
         public Texture2D Right => _texture;
-
-        public static UniformBlockTexture CreateFromFile(string texturePath)
-        {
-            if (!File.Exists(texturePath)) throw new FileNotFoundException($"{texturePath}: No such file");
-            return new UniformBlockTexture(TextureLoader.Load(texturePath));
-        }
     }
 }
