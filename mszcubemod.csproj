@@ -11,11 +11,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="blocks\**" />
     <Compile Remove="dependencies\**" />
-    <EmbeddedResource Remove="blocks\**" />
     <EmbeddedResource Remove="dependencies\**" />
-    <None Remove="blocks\**" />
     <None Remove="dependencies\**" />
   </ItemGroup>
 
@@ -67,7 +64,8 @@
   </ItemGroup>
 
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="COPY &quot;$(TargetPath)&quot; &quot;$(GamePath)/Mods&quot;" />
+		<MakeDir Directories="$(GamePath)/Mods/Zerocraft" />
+		<Exec Command="copy &quot;$(SolutionDir)/blocks&quot; &quot;$(GamePath)/Mods/Zerocraft&quot;" />
 	</Target>
 
 </Project>
