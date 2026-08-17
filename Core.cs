@@ -175,38 +175,53 @@ namespace mszcubemod
         {
             Mesh mesh = new();
 
-            // 4 verts per face so UVs are independent per face
             Vector3[] vertices = new Vector3[]
             {
                 // Right (+X)
                 new(0.5f, -0.5f, -0.5f), new(0.5f,  0.5f, -0.5f),
                 new(0.5f,  0.5f,  0.5f), new(0.5f, -0.5f,  0.5f),
+
                 // Left (-X)
                 new(-0.5f, -0.5f,  0.5f), new(-0.5f,  0.5f,  0.5f),
                 new(-0.5f,  0.5f, -0.5f), new(-0.5f, -0.5f, -0.5f),
+
                 // Top (+Y)
                 new(-0.5f, 0.5f, -0.5f), new(-0.5f, 0.5f,  0.5f),
                 new( 0.5f, 0.5f,  0.5f), new( 0.5f, 0.5f, -0.5f),
+
                 // Bottom (-Y)
                 new(-0.5f, -0.5f,  0.5f), new(-0.5f, -0.5f, -0.5f),
                 new( 0.5f, -0.5f, -0.5f), new( 0.5f, -0.5f,  0.5f),
+
                 // Front (+Z)
                 new(-0.5f, -0.5f, 0.5f), new( 0.5f, -0.5f, 0.5f),
                 new( 0.5f,  0.5f, 0.5f), new(-0.5f,  0.5f, 0.5f),
+
                 // Back (-Z)
                 new( 0.5f, -0.5f, -0.5f), new(-0.5f, -0.5f, -0.5f),
                 new(-0.5f,  0.5f, -0.5f), new( 0.5f,  0.5f, -0.5f),
             };
 
-            Vector2[] uvs = new Vector2[24];
-            for (int i = 0; i < 6; i++)
+            Vector2[] uvs =
             {
-                int b = i * 4;
-                uvs[b] = new Vector2(0, 0);
-                uvs[b + 1] = new Vector2(0, 1);
-                uvs[b + 2] = new Vector2(1, 1);
-                uvs[b + 3] = new Vector2(1, 0);
-            }
+                // Right (+X): U = Z, V = Y
+                new(0, 0), new(0, 1), new(1, 1), new(1, 0),
+
+                // Left (-X): U = Z, V = Y
+                new(0, 0), new(0, 1), new(1, 1), new(1, 0),
+
+                // Top (+Y): U = X, V = Z
+                new(0, 0), new(0, 1), new(1, 1), new(1, 0),
+
+                // Bottom (-Y): U = X, V = Z
+                new(0, 0), new(0, 1), new(1, 1), new(1, 0),
+
+                // Front (+Z): U = X, V = Y
+                new(0, 0), new(1, 0), new(1, 1), new(0, 1),
+
+                // Back (-Z): U = X, V = Y
+                new(0, 0), new(1, 0), new(1, 1), new(0, 1),
+            };
 
             mesh.vertices = vertices;
             mesh.uv = uvs;
@@ -215,11 +230,20 @@ namespace mszcubemod
             for (int i = 0; i < 6; i++)
             {
                 int b = i * 4;
-                mesh.SetTriangles(new int[] { b, b + 1, b + 2, b, b + 2, b + 3 }, i);
+
+                mesh.SetTriangles(
+                    new int[]
+                    {
+                b, b + 1, b + 2,
+                b, b + 2, b + 3
+                    },
+                    i
+                );
             }
 
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
+
             return mesh;
         }
 
