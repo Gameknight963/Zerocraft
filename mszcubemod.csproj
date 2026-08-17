@@ -20,42 +20,46 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Assembly-CSharp">
-      <HintPath>dependencies\unity assemblies\Assembly-CSharp.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2CppInterop.Runtime">
-      <HintPath>dependencies\melonloader assemblies\Il2CppInterop.Runtime.dll</HintPath>
-    </Reference>
-    <Reference Include="Il2Cppmscorlib">
-      <HintPath>dependencies\unity assemblies\Il2Cppmscorlib.dll</HintPath>
-    </Reference>
-    <Reference Include="InventoryFramework">
-      <HintPath>dependencies\InventoryFramework.dll</HintPath>
-    </Reference>
-    <Reference Include="MelonLoader">
-      <HintPath>dependencies\melonloader assemblies\MelonLoader.dll</HintPath>
-    </Reference>
-    <Reference Include="Multiside.shared">
-      <HintPath>dependencies\Multiside.shared.dll</HintPath>
-    </Reference>
-    <Reference Include="PhotonClient">
-      <HintPath>dependencies\PhotonClient.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine">
-      <HintPath>dependencies\unity assemblies\UnityEngine.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.CoreModule">
-      <HintPath>dependencies\unity assemblies\UnityEngine.CoreModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.ImageConversionModule">
-      <HintPath>dependencies\unity assemblies\UnityEngine.ImageConversionModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.InputLegacyModule">
-      <HintPath>dependencies\unity assemblies\UnityEngine.InputLegacyModule.dll</HintPath>
-    </Reference>
-    <Reference Include="UnityEngine.PhysicsModule">
-      <HintPath>dependencies\unity assemblies\UnityEngine.PhysicsModule.dll</HintPath>
-    </Reference>
+
+		<Reference Include="Multiside.shared">
+			<HintPath>dependencies\Multiside.shared.dll</HintPath>
+		</Reference>
+		<Reference Include="PhotonClient">
+			<HintPath>dependencies\PhotonClient.dll</HintPath>
+		</Reference>
+		<Reference Include="InventoryFramework">
+			<HintPath>dependencies\InventoryFramework.dll</HintPath>
+		</Reference>
+		
+		<Reference Include="MelonLoader">
+			<HintPath>$(MelonAssembliesPath)\MelonLoader.dll</HintPath>
+		</Reference>
+
+		<Reference Include="Il2CppInterop.Runtime">
+			<HintPath>$(MelonAssembliesPath)\Il2CppInterop.Runtime.dll</HintPath>
+		</Reference>
+		
+		<Reference Include="Assembly-CSharp">
+			<HintPath>$(GameAssembliesPath)\Assembly-CSharp.dll</HintPath>
+		</Reference>
+		<Reference Include="Il2Cppmscorlib">
+			<HintPath>$(GameAssembliesPath)\Il2Cppmscorlib.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine">
+			<HintPath>$(GameAssembliesPath)\UnityEngine.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.CoreModule">
+			<HintPath>$(GameAssembliesPath)\UnityEngine.CoreModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.ImageConversionModule">
+			<HintPath>$(GameAssembliesPath)\UnityEngine.ImageConversionModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.InputLegacyModule">
+			<HintPath>$(GameAssembliesPath)\UnityEngine.InputLegacyModule.dll</HintPath>
+		</Reference>
+		<Reference Include="UnityEngine.PhysicsModule">
+			<HintPath>$(GameAssembliesPath)\UnityEngine.PhysicsModule.dll</HintPath>
+		</Reference>
   </ItemGroup>
 
   <ItemGroup>
