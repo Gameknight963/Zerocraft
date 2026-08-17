@@ -61,7 +61,7 @@ namespace mszcubemod
 
             foreach (Block block in WorldManager.Instance.Blocks)
             {
-                Texture2D preview = BlockTextureRenderer.CreateIsometricPreview(block.Texture);
+                Texture2D preview = BlockPreviewRenderer.CreateIsometricPreview(block.Texture);
                 Sprite sprite = Sprite.Create(preview,
                     new Rect(0, 0, preview.width, preview.height),
                     new Vector2(0.5f, 0.5f));

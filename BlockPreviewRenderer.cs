@@ -2,7 +2,7 @@
 
 namespace mszcubemod
 {
-    public static class BlockTextureRenderer
+    public static class BlockPreviewRenderer
     {
         public static Texture2D CreateIsometricPreview(IBlockTexture blockTexture, int size = 64)
         {
