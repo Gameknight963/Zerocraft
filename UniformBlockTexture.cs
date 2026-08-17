@@ -5,15 +5,17 @@ namespace mszcubemod
     public class UniformBlockTexture : IBlockTexture
     {
         private readonly Texture2D _texture;
+
         public UniformBlockTexture(Texture2D texture)
         {
             _texture = texture;
         }
-        public Texture2D Top => _texture;
-        public Texture2D Bottom => _texture;
-        public Texture2D Front => _texture;
-        public Texture2D Back => _texture;
-        public Texture2D Left => _texture;
-        public Texture2D Right => _texture;
+
+        public Texture2D Up => _texture;
+        public Texture2D Down => _texture;
+        public Texture2D North => _texture;
+        public Texture2D South => _texture;
+        public Texture2D East => _texture;
+        public Texture2D West => _texture;
     }
 }

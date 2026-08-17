@@ -4,27 +4,27 @@ namespace mszcubemod
 {
     public class CompositeBlockTexture : IBlockTexture
     {
-        public Texture2D Top { get; }
-        public Texture2D Bottom { get; }
-        public Texture2D Front { get; }
-        public Texture2D Back { get; }
-        public Texture2D Left { get; }
-        public Texture2D Right { get; }
+        public Texture2D Up { get; }
+        public Texture2D Down { get; }
+        public Texture2D North { get; }
+        public Texture2D South { get; }
+        public Texture2D East { get; }
+        public Texture2D West { get; }
 
         public CompositeBlockTexture(
-            Texture2D top,
-            Texture2D bottom,
-            Texture2D front,
-            Texture2D back,
-            Texture2D left,
-            Texture2D right)
+            Texture2D up,
+            Texture2D down,
+            Texture2D north,
+            Texture2D south,
+            Texture2D east,
+            Texture2D west)
         {
-            Top = top;
-            Bottom = bottom;
-            Front = front;
-            Back = back;
-            Left = left;
-            Right = right;
+            Up = up;
+            Down = down;
+            North = north;
+            South = south;
+            East = east;
+            West = west;
         }
     }
 }

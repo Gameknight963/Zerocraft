@@ -4,11 +4,11 @@ namespace mszcubemod
 {
     public interface IBlockTexture
     {
-        Texture2D Top { get; }
-        Texture2D Bottom { get; }
-        Texture2D Front { get; }
-        Texture2D Back { get; }
-        Texture2D Left { get; }
-        Texture2D Right { get; }
+        Texture2D Up { get; }
+        Texture2D Down { get; }
+        Texture2D North { get; }
+        Texture2D South { get; }
+        Texture2D East { get; }
+        Texture2D West { get; }
     }
 }

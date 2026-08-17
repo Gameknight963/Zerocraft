@@ -28,9 +28,9 @@ namespace mszcubemod
             Color[] pixels = new Color[width * height];
             for (int i = 0; i < pixels.Length; i++) pixels[i] = Color.clear;
 
-            Color[] topPixels = SampleTexture(blockTexture.Top, size, size);
-            Color[] leftPixels = SampleTexture(blockTexture.Left, size, size);
-            Color[] rightPixels = SampleTexture(blockTexture.Right, size, size);
+            Color[] topPixels = SampleTexture(blockTexture.Up, size, size);
+            Color[] leftPixels = SampleTexture(blockTexture.East, size, size);
+            Color[] rightPixels = SampleTexture(blockTexture.West, size, size);
 
             // Top face
             for (int pu = 0; pu < size; pu++)

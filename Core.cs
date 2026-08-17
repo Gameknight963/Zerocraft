@@ -151,12 +151,12 @@ namespace mszcubemod
 
             renderer.materials = new Material[]
             {
-                CreateTextureMaterial(texture.Right),   // +X
-                CreateTextureMaterial(texture.Left),    // -X
-                CreateTextureMaterial(texture.Top),     // +Y
-                CreateTextureMaterial(texture.Bottom),  // -Y
-                CreateTextureMaterial(texture.Front),   // +Z
-                CreateTextureMaterial(texture.Back),    // -Z
+                CreateTextureMaterial(texture.West),   // +X
+                CreateTextureMaterial(texture.East),    // -X
+                CreateTextureMaterial(texture.Up),     // +Y
+                CreateTextureMaterial(texture.Down),  // -Y
+                CreateTextureMaterial(texture.North),   // +Z
+                CreateTextureMaterial(texture.South),    // -Z
             };
 
             cube.AddComponent<BoxCollider>();
