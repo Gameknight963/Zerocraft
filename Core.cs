@@ -226,24 +226,13 @@ namespace mszcubemod
             mesh.vertices = vertices;
             mesh.uv = uvs;
             mesh.subMeshCount = 6;
-
             for (int i = 0; i < 6; i++)
             {
                 int b = i * 4;
-
-                mesh.SetTriangles(
-                    new int[]
-                    {
-                b, b + 1, b + 2,
-                b, b + 2, b + 3
-                    },
-                    i
-                );
+                mesh.SetTriangles(new int[] { b, b + 1, b + 2, b, b + 2, b + 3 }, i);
             }
-
             mesh.RecalculateNormals();
             mesh.RecalculateBounds();
-
             return mesh;
         }
 
@@ -255,9 +244,9 @@ namespace mszcubemod
                 Mathf.Round(position.z / snapGrid.z) * snapGrid.z);
         }
 
-        public GameObject CreateWireframeCube(Vector3 position, Vector3 size)
+        public static GameObject CreateWireframeCube(Vector3 position, Vector3 size)
         {
-            GameObject obj = new GameObject("cubePreview");
+            GameObject obj = new("cubePreview");
             obj.transform.position = position;
 
             Vector3 h = size * 0.5f;
