@@ -13,7 +13,6 @@ namespace mszcubemod
         GameObject? playerCamera;
         GameObject? ghostCube;
 
-        public static Vector3 DefaultCubeSize => new(1f, 1f, 1f);
         public static readonly string ModResources = Path.Combine(MelonEnvironment.ModsDirectory, "Zerocraft");
         const string cubeName = "cube-2guyfhgweybvgfijbneurnbv";
 
@@ -62,8 +61,12 @@ namespace mszcubemod
 
             foreach (Block block in WorldManager.Instance.Blocks)
             {
-                Sprite sprite = Sprite.Create(block.Texture, new Rect(0, 0, block.Texture.width, block.Texture.height), new Vector2(0.5f, 0.5f));
-                InventoryManager.Instance.RegisterItem(new ItemDefinition(block.Id, block.Name, sprite));
+                Texture2D preview = BlockTextureRenderer.CreateIsometricPreview(block.Texture);
+                Sprite sprite = Sprite.Create(preview,
+                    new Rect(0, 0, preview.width, preview.height),
+                    new Vector2(0.5f, 0.5f));
+                InventoryManager.Instance.RegisterItem(
+                    new ItemDefinition(block.Id, block.Name, sprite));
             }
 
             InventoryManager.Instance.OnItemSelected += item =>
@@ -135,17 +138,89 @@ namespace mszcubemod
             return Physics.Raycast(ray, out hit, 4f);
         }
 
-        public static GameObject CreateCube(Vector3 position, Texture2D texture, Vector3 scale)
+        public static GameObject CreateCube(Vector3 position, IBlockTexture texture, Vector3 scale)
         {
-            GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            GameObject cube = new GameObject(cubeName);
             cube.transform.position = position;
             cube.transform.localScale = scale;
-            cube.name = cubeName;
-            MeshRenderer renderer = cube.GetComponent<MeshRenderer>();
-            Material mat = new(Shader.Find("Standard"));
-            mat.SetTexture("_MainTex", texture);
-            renderer.material = mat;
+
+            MeshFilter filter = cube.AddComponent<MeshFilter>();
+            MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
+
+            filter.mesh = BuildCubeMesh();
+
+            renderer.materials = new Material[]
+            {
+                CreateTextureMaterial(texture.Right),   // +X
+                CreateTextureMaterial(texture.Left),    // -X
+                CreateTextureMaterial(texture.Top),     // +Y
+                CreateTextureMaterial(texture.Bottom),  // -Y
+                CreateTextureMaterial(texture.Front),   // +Z
+                CreateTextureMaterial(texture.Back),    // -Z
+            };
+
+            cube.AddComponent<BoxCollider>();
+
             return cube;
+        }
+
+        private static Material CreateTextureMaterial(Texture2D tex)
+        {
+            Material mat = new(Shader.Find("Standard"));
+            mat.SetTexture("_MainTex", tex);
+            return mat;
+        }
+
+        private static Mesh BuildCubeMesh()
+        {
+            Mesh mesh = new();
+
+            // 4 verts per face so UVs are independent per face
+            Vector3[] vertices = new Vector3[]
+            {
+                // Right (+X)
+                new(0.5f, -0.5f, -0.5f), new(0.5f,  0.5f, -0.5f),
+                new(0.5f,  0.5f,  0.5f), new(0.5f, -0.5f,  0.5f),
+                // Left (-X)
+                new(-0.5f, -0.5f,  0.5f), new(-0.5f,  0.5f,  0.5f),
+                new(-0.5f,  0.5f, -0.5f), new(-0.5f, -0.5f, -0.5f),
+                // Top (+Y)
+                new(-0.5f, 0.5f, -0.5f), new(-0.5f, 0.5f,  0.5f),
+                new( 0.5f, 0.5f,  0.5f), new( 0.5f, 0.5f, -0.5f),
+                // Bottom (-Y)
+                new(-0.5f, -0.5f,  0.5f), new(-0.5f, -0.5f, -0.5f),
+                new( 0.5f, -0.5f, -0.5f), new( 0.5f, -0.5f,  0.5f),
+                // Front (+Z)
+                new(-0.5f, -0.5f, 0.5f), new( 0.5f, -0.5f, 0.5f),
+                new( 0.5f,  0.5f, 0.5f), new(-0.5f,  0.5f, 0.5f),
+                // Back (-Z)
+                new( 0.5f, -0.5f, -0.5f), new(-0.5f, -0.5f, -0.5f),
+                new(-0.5f,  0.5f, -0.5f), new( 0.5f,  0.5f, -0.5f),
+            };
+
+            Vector2[] uvs = new Vector2[24];
+            for (int i = 0; i < 6; i++)
+            {
+                int b = i * 4;
+                uvs[b] = new Vector2(0, 0);
+                uvs[b + 1] = new Vector2(0, 1);
+                uvs[b + 2] = new Vector2(1, 1);
+                uvs[b + 3] = new Vector2(1, 0);
+            }
+
+            mesh.vertices = vertices;
+            mesh.uv = uvs;
+            mesh.subMeshCount = 6;
+
+            for (int i = 0; i < 6; i++)
+            {
+                int b = i * 4;
+                mesh.SetTriangles(new int[] { b, b + 1, b + 2, b, b + 2, b + 3 }, i);
+            }
+
+            mesh.RecalculateNormals();
+            mesh.RecalculateBounds();
+            return mesh;
         }
 
         public static Vector3 SnapToGrid(Vector3 position, Vector3 snapGrid)

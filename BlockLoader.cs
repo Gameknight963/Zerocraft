@@ -1,9 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
 namespace mszcubemod
 {
     public static class BlockLoader
@@ -16,32 +11,49 @@ namespace mszcubemod
             {
                 string ext = Path.GetExtension(filePath).ToLower();
                 if (ext != ".png" && ext != ".jpg") continue;
-                string name = Path.GetFileNameWithoutExtension(filePath);
-                blocks.Add(new Block(name, name, filePath));
+                string id = Path.GetFileNameWithoutExtension(filePath);
+                blocks.Add(new Block(id, id, new UniformBlockTexture(TextureLoader.Load(filePath))));
             }
 
             foreach (string dir in Directory.GetDirectories(Core.ModResources))
             {
-                string texturePath = Directory.GetFiles(dir, "*.png")
-                    .Concat(Directory.GetFiles(dir, "*.jpg"))
-                    .First();
-                if (texturePath == null) continue;
+                string id = Path.GetFileName(dir);
+                IBlockTexture texture = LoadCompositeTexture(dir);
 
-                string dirName = Path.GetFileName(dir);
                 string jsonPath = Path.Combine(dir, "blockdata.json");
-
                 if (File.Exists(jsonPath))
                 {
-                    Block? data = JsonConvert.DeserializeObject<Block>(File.ReadAllText(jsonPath)) 
+                    BlockData data = JsonConvert.DeserializeObject<BlockData>(File.ReadAllText(jsonPath))
                         ?? throw new InvalidOperationException($"{jsonPath} is malformed or invalid");
-                    if (string.IsNullOrEmpty(data.Name)) throw new FormatException($"{jsonPath}: Block name is malformed");
-                    if (data.Size == default) throw new FormatException($"{jsonPath}: Block size is malformed");
-                    Block block = new Block(dirName, data.Name, texturePath, data.Size);
-                    blocks.Add(block);
+                    blocks.Add(new Block(id, data.Name ?? id, texture, data.Size));
+                }
+                else
+                {
+                    blocks.Add(new Block(id, id, texture));
                 }
             }
 
             return blocks;
+        }
+
+        private static IBlockTexture LoadCompositeTexture(string dir)
+        {
+            return new CompositeBlockTexture(
+                top: TextureLoader.Load(FindFace(dir, "top")),
+                bottom: TextureLoader.Load(FindFace(dir, "bottom")),
+                front: TextureLoader.Load(FindFace(dir, "front")),
+                back: TextureLoader.Load(FindFace(dir, "back")),
+                left: TextureLoader.Load(FindFace(dir, "left")),
+                right: TextureLoader.Load(FindFace(dir, "right"))
+            );
+        }
+
+        private static string FindFace(string dir, string face)
+        {
+            string? path = Directory.GetFiles(dir, $"{face}.png")
+                .Concat(Directory.GetFiles(dir, $"{face}.jpg"))
+                .FirstOrDefault();
+            return path ?? throw new FileNotFoundException($"Missing face texture '{face}' in {dir}");
         }
     }
 }
