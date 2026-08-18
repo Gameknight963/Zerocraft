@@ -39,12 +39,12 @@ namespace mszcubemod
         private static IBlockTexture LoadCompositeTexture(string dir)
         {
             return new CompositeBlockTexture(
-                top: TextureLoader.Load(FindFace(dir, "top")),
-                bottom: TextureLoader.Load(FindFace(dir, "bottom")),
-                front: TextureLoader.Load(FindFace(dir, "front")),
-                back: TextureLoader.Load(FindFace(dir, "back")),
-                left: TextureLoader.Load(FindFace(dir, "left")),
-                right: TextureLoader.Load(FindFace(dir, "right"))
+                up: TextureLoader.Load(FindFace(dir, "up")),
+                down: TextureLoader.Load(FindFace(dir, "down")),
+                north: TextureLoader.Load(FindFace(dir, "north")),
+                south: TextureLoader.Load(FindFace(dir, "south")),
+                east: TextureLoader.Load(FindFace(dir, "east")),
+                west: TextureLoader.Load(FindFace(dir, "west"))
             );
         }
 
