@@ -19,9 +19,12 @@ namespace mszcubemod
                 (animations.East, materials[0]),
                 (animations.West, materials[1]),
             };
-
-            foreach ((AnimatedTexture? animation, Material _) in _animatedFaces) 
+            foreach ((AnimatedTexture animation, Material material) in _animatedFaces)
+            {
+                Material mat = material;
+                animation.Updated += () => mat.mainTexture = animation.Texture;
                 animation.Start();
+            }
         }
 
         private void Update()
