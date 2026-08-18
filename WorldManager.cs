@@ -1,5 +1,4 @@
-﻿using System.Threading.Tasks.Dataflow;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace mszcubemod
 {
@@ -26,7 +25,7 @@ namespace mszcubemod
         public void PlaceBlock(string blockId, Vector3 position)
         {
             if (Blocks.FirstOrDefault(b => b.Id == blockId) is not Block block) return;
-            GameObject obj = Core.CreateCube(position, block.Texture, block.Size);
+            GameObject obj = CubeFactory.CreateCube(position, block.Texture, block.Size);
             placedBlocks[position] = new PlacedBlock(blockId, position, obj);
         }
 
