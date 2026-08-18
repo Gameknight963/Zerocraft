@@ -1,8 +1,9 @@
-﻿using MultiSide.shared;
+﻿using mszcubemod.World;
+using MultiSide.shared;
 using Photon.Client;
 using UnityEngine;
 
-namespace mszcubemod
+namespace mszcubemod.Networking
 {
     class CubeNetworking
     {

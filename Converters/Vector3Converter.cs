@@ -2,7 +2,7 @@
 using System;
 using UnityEngine;
 
-namespace mszcubemod
+namespace mszcubemod.Converters
 {
     public class Vector3Converter : JsonConverter<Vector3>
     {

@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-namespace mszcubemod
+namespace mszcubemod.Textures
 {
     public class AnimatedTexture
     {

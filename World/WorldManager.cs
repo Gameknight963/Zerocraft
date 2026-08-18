@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using mszcubemod.Rendering;
+using UnityEngine;
 
-namespace mszcubemod
+namespace mszcubemod.World
 {
     class WorldManager
     {

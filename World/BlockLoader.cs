@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using mszcubemod.Textures;
+using Newtonsoft.Json;
 using UnityEngine;
 
-namespace mszcubemod
+namespace mszcubemod.World
 {
     public static class BlockLoader
     {

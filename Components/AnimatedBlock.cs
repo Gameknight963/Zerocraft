@@ -1,7 +1,8 @@
 ﻿using MelonLoader;
+using mszcubemod.Textures;
 using UnityEngine;
 
-namespace mszcubemod
+namespace mszcubemod.Components
 {
     [RegisterTypeInIl2Cpp]
     public class AnimatedBlock : MonoBehaviour

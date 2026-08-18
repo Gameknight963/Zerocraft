@@ -1,6 +1,7 @@
-﻿using UnityEngine;
+﻿using mszcubemod.Textures;
+using UnityEngine;
 
-namespace mszcubemod
+namespace mszcubemod.World
 {
     public class Block
     {

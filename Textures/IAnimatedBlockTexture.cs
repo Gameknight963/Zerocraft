@@ -1,4 +1,4 @@
-﻿namespace mszcubemod
+﻿namespace mszcubemod.Textures
 {
     public interface IAnimatedBlockTexture : IBlockTexture
     {
