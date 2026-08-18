@@ -164,6 +164,29 @@ namespace mszcubemod
             return cube;
         }
 
+        public static GameObject CreateCube(Vector3 position, AnimatedBlockFaceTextures animations, Vector3 scale)
+        {
+            GameObject cube = new(cubeName);
+            cube.transform.position = position;
+            cube.transform.localScale = scale;
+            MeshFilter filter = cube.AddComponent<MeshFilter>();
+            MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
+            filter.mesh = BuildCubeMesh();
+            renderer.materials = new Material[]
+            {
+                CreateTextureMaterial(animations.West.Texture),
+                CreateTextureMaterial(animations.East.Texture),
+                CreateTextureMaterial(animations.Up.Texture),
+                CreateTextureMaterial(animations.Down.Texture),
+                CreateTextureMaterial(animations.North.Texture),
+                CreateTextureMaterial(animations.South.Texture),
+            };
+            AnimatedBlock animBlock = cube.AddComponent<AnimatedBlock>();
+            animBlock.Initialize(animations, renderer.materials);
+            cube.AddComponent<BoxCollider>();
+            return cube;
+        }
+
         private static Material CreateTextureMaterial(Texture2D tex)
         {
             Material mat = new(Shader.Find("Standard"));
