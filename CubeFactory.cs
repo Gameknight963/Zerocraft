@@ -11,46 +11,31 @@ namespace mszcubemod
             GameObject cube = new GameObject(cubeName);
             cube.transform.position = position;
             cube.transform.localScale = scale;
-
-            MeshFilter filter = cube.AddComponent<MeshFilter>();
-            MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
-
-            filter.mesh = BuildCubeMesh();
-
-            renderer.materials = new Material[]
-            {
-                CreateTextureMaterial(texture.West),   // +X
-                CreateTextureMaterial(texture.East),    // -X
-                CreateTextureMaterial(texture.Up),     // +Y
-                CreateTextureMaterial(texture.Down),  // -Y
-                CreateTextureMaterial(texture.North),   // +Z
-                CreateTextureMaterial(texture.South),    // -Z
-            };
-
-            cube.AddComponent<BoxCollider>();
-
-            return cube;
-        }
-
-        public static GameObject CreateCube(Vector3 position, AnimatedBlockFaceTextures animations, Vector3 scale)
-        {
-            GameObject cube = new(cubeName);
-            cube.transform.position = position;
-            cube.transform.localScale = scale;
             MeshFilter filter = cube.AddComponent<MeshFilter>();
             MeshRenderer renderer = cube.AddComponent<MeshRenderer>();
             filter.mesh = BuildCubeMesh();
-            renderer.materials = new Material[]
+            Material[] materials = new Material[]
             {
-                CreateTextureMaterial(animations.West.Texture),
-                CreateTextureMaterial(animations.East.Texture),
-                CreateTextureMaterial(animations.Up.Texture),
-                CreateTextureMaterial(animations.Down.Texture),
-                CreateTextureMaterial(animations.North.Texture),
-                CreateTextureMaterial(animations.South.Texture),
+                CreateTextureMaterial(texture.West),
+                CreateTextureMaterial(texture.East),
+                CreateTextureMaterial(texture.Up),
+                CreateTextureMaterial(texture.Down),
+                CreateTextureMaterial(texture.North),
+                CreateTextureMaterial(texture.South),
             };
-            AnimatedBlock animBlock = cube.AddComponent<AnimatedBlock>();
-            animBlock.Initialize(animations, renderer.materials);
+            renderer.materials = materials;
+            if (texture is IAnimatedBlockTexture animated)
+            {
+                animated.Updated += () =>
+                {
+                    materials[0].mainTexture = animated.West;
+                    materials[1].mainTexture = animated.East;
+                    materials[2].mainTexture = animated.Up;
+                    materials[3].mainTexture = animated.Down;
+                    materials[4].mainTexture = animated.North;
+                    materials[5].mainTexture = animated.South;
+                };
+            }
             cube.AddComponent<BoxCollider>();
             return cube;
         }
