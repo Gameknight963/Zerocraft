@@ -26,7 +26,7 @@ namespace mszcubemod.World
         public void PlaceBlock(string blockId, Vector3 position)
         {
             if (Blocks.FirstOrDefault(b => b.Id == blockId) is not Block block) return;
-            GameObject obj = CubeFactory.CreateCube(position, block.Texture, block.Size);
+            GameObject obj = CubeFactory.CreateCube(position, block.Texture, block.Size, block.Transparency);
             placedBlocks[position] = new PlacedBlock(blockId, position, obj);
         }
 

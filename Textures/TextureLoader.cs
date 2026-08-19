@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace mszcubemod.Util
+namespace mszcubemod.Textures
 {
     public static class TextureLoader
     {

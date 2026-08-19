@@ -1,4 +1,5 @@
-﻿using mszcubemod.Textures;
+﻿using mszcubemod.Rendering;
+using mszcubemod.Textures;
 using Newtonsoft.Json;
 using UnityEngine;
 
@@ -14,30 +15,39 @@ namespace mszcubemod.World
                 string ext = Path.GetExtension(filePath).ToLower();
                 if (ext != ".png" && ext != ".jpg") continue;
                 string id = Path.GetFileNameWithoutExtension(filePath);
-                Texture2D tex = TextureLoader.Load(filePath);
-                if (tex.height > tex.width)
-                {
-                    AnimatedTexture anim = SliceAnimation(tex, null, null);
-                    blocks.Add(new Block(id, id, new UniformAnimatedBlockTexture(anim)));
-                }
-                else
-                {
-                    blocks.Add(new Block(id, id, new UniformBlockTexture(tex)));
-                }
+                blocks.Add(new Block(id, id, new UniformBlockTexture(TextureLoader.Load(filePath))));
             }
             foreach (string dir in Directory.GetDirectories(Core.ModResources))
             {
                 string id = Path.GetFileName(dir);
-                string jsonPath = Path.Combine(dir, "blockdata.json");
                 BlockData? data = null;
+                string jsonPath = Path.Combine(dir, "blockdata.json");
                 if (File.Exists(jsonPath))
                     data = JsonConvert.DeserializeObject<BlockData>(File.ReadAllText(jsonPath))
                         ?? throw new InvalidOperationException($"{jsonPath} is malformed or invalid");
 
-                IBlockTexture texture = LoadCompositeTexture(dir, data);
-                blocks.Add(new Block(id, data?.Name ?? id, texture, data?.Size));
+                TransparencyMode transparency = data?.Transparency ?? TransparencyMode.Opaque;
+                IBlockTexture texture = LoadTexture(dir, id, data);
+                blocks.Add(new Block(id, data?.Name ?? id, texture, data?.Size, transparency));
             }
             return blocks;
+        }
+
+        private static IBlockTexture LoadTexture(string dir, string id, BlockData? data)
+        {
+            string? uniformPath = Directory.GetFiles(dir, $"{id}.png")
+                .Concat(Directory.GetFiles(dir, $"{id}.jpg"))
+                .FirstOrDefault();
+
+            if (uniformPath != null)
+            {
+                Texture2D tex = TextureLoader.Load(uniformPath);
+                if (tex.height > tex.width)
+                    return new UniformAnimatedBlockTexture(SliceAnimation(tex, data?.FrameDurations, data?.AnimationSpeed));
+                return new UniformBlockTexture(tex);
+            }
+
+            return LoadCompositeTexture(dir, data);
         }
 
         private static IBlockTexture LoadCompositeTexture(string dir, BlockData? data)

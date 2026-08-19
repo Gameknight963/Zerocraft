@@ -1,4 +1,5 @@
-﻿using mszcubemod.Textures;
+﻿using mszcubemod.Rendering;
+using mszcubemod.Textures;
 using UnityEngine;
 
 namespace mszcubemod.World
@@ -10,15 +11,17 @@ namespace mszcubemod.World
         public string Id { get; set; } = "";
         public string Name { get; set; } = "";
         public Vector3 Size { get; set; } = new Vector3(0.5f, 0.5f, 0.5f);
+        public TransparencyMode Transparency { get; set; }
 
         public IBlockTexture Texture { get; private set; }
 
-        public Block(string id, string name, IBlockTexture texture, Vector3? size = null)
+        public Block(string id, string name, IBlockTexture texture, Vector3? size = null, TransparencyMode transparency = TransparencyMode.Opaque)
         {
             Size = size ?? DefaultCubeSize;
             Id = id;
             Name = name;
             Texture = texture;
+            Transparency = transparency;
         }
     }
 }

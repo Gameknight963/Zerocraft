@@ -7,7 +7,8 @@ namespace mszcubemod.Rendering
     {
         const string cubeName = "zcube";
 
-        public static GameObject CreateCube(Vector3 position, IBlockTexture texture, Vector3 scale)
+        public static GameObject CreateCube(Vector3 position, IBlockTexture texture, 
+            Vector3 scale, TransparencyMode transparency = TransparencyMode.Opaque)
         {
             GameObject cube = new GameObject(cubeName);
             cube.transform.position = position;
@@ -17,12 +18,12 @@ namespace mszcubemod.Rendering
             filter.mesh = BuildCubeMesh();
             Material[] materials = new Material[]
             {
-                CreateTextureMaterial(texture.West),
-                CreateTextureMaterial(texture.East),
-                CreateTextureMaterial(texture.Up),
-                CreateTextureMaterial(texture.Down),
-                CreateTextureMaterial(texture.North),
-                CreateTextureMaterial(texture.South),
+                CreateTextureMaterial(texture.West, transparency),
+                CreateTextureMaterial(texture.East, transparency),
+                CreateTextureMaterial(texture.Up, transparency),
+                CreateTextureMaterial(texture.Down, transparency),
+                CreateTextureMaterial(texture.North, transparency),
+                CreateTextureMaterial(texture.South, transparency),
             };
             renderer.materials = materials;
             if (texture is IAnimatedBlockTexture animated)
@@ -147,10 +148,27 @@ namespace mszcubemod.Rendering
             return mesh;
         }
 
-        private static Material CreateTextureMaterial(Texture2D tex)
+        private static Material CreateTextureMaterial(Texture2D tex, TransparencyMode transparency = TransparencyMode.Opaque)
         {
             Material mat = new(Shader.Find("Standard"));
             mat.SetTexture("_MainTex", tex);
+            switch (transparency)
+            {
+                case TransparencyMode.Cutout:
+                    mat.SetFloat("_Mode", 1);
+                    mat.SetFloat("_Cutoff", 0.5f);
+                    mat.EnableKeyword("_ALPHATEST_ON");
+                    mat.renderQueue = 2450;
+                    break;
+                case TransparencyMode.Transparent:
+                    mat.SetFloat("_Mode", 3);
+                    mat.EnableKeyword("_ALPHABLEND_ON");
+                    mat.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                    mat.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
+                    mat.SetInt("_ZWrite", 0);
+                    mat.renderQueue = 3000;
+                    break;
+            }
             return mat;
         }
     }
