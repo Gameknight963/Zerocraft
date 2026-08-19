@@ -1,4 +1,5 @@
-﻿using mszcubemod.Textures;
+﻿using mszcubemod.Components;
+using mszcubemod.Textures;
 using UnityEngine;
 
 namespace mszcubemod.Rendering
@@ -39,6 +40,7 @@ namespace mszcubemod.Rendering
                 };
             }
             cube.AddComponent<BoxCollider>();
+            cube.AddComponent<PlacedBlockComponent>();
             return cube;
         }
 
