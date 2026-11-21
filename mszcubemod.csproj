@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
+    <TargetFramework>net472</TargetFramework>
     <RootNamespace>mszcubemod</RootNamespace>
     <AssemblyName>Zerocraft</AssemblyName>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>14</LangVersion>
     <Optimize Condition="'$(Configuration)' == 'Release'">true</Optimize>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
@@ -31,16 +32,9 @@
 		<Reference Include="MelonLoader">
 			<HintPath>$(MelonAssembliesPath)\MelonLoader.dll</HintPath>
 		</Reference>
-
-		<Reference Include="Il2CppInterop.Runtime">
-			<HintPath>$(MelonAssembliesPath)\Il2CppInterop.Runtime.dll</HintPath>
-		</Reference>
 		
 		<Reference Include="Assembly-CSharp">
 			<HintPath>$(GameAssembliesPath)\Assembly-CSharp.dll</HintPath>
-		</Reference>
-		<Reference Include="Il2Cppmscorlib">
-			<HintPath>$(GameAssembliesPath)\Il2Cppmscorlib.dll</HintPath>
 		</Reference>
 		<Reference Include="UnityEngine">
 			<HintPath>$(GameAssembliesPath)\UnityEngine.dll</HintPath>
@@ -60,12 +54,15 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="IsExternalInit" Version="1.0.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
-
+	
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<MakeDir Directories="$(GamePath)/Mods/Zerocraft" />
-		<Exec Command="copy &quot;$(SolutionDir)/blocks&quot; &quot;$(GamePath)/Mods/Zerocraft&quot;" />
+		<Exec Command="xcopy &quot;$(SolutionDir)blocks&quot; &quot;$(GamePath)\Mods\Zerocraft\&quot; /E /I /Y" />
 		<Exec Command="copy &quot;$(TargetPath)&quot; &quot;$(GamePath)/Mods/&quot;" />
 	</Target>
 

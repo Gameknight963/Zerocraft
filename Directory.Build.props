@@ -1,7 +1,7 @@
 <Project>
   <PropertyGroup>
-    <GamePath>C:\Users\sebis\projects\launcherdotnet\bin\Debug\net10.0-windows\games\zerocrack_d93b67c9-3600-4a59-91cc-20d38ded9ffc</GamePath>
-	<GameAssembliesPath>$(GamePath)\MelonLoader\Il2CppAssemblies</GameAssembliesPath>
+    <GamePath>C:\Users\sebis\projects\launcherdotnet\launcherdotnet\bin\Debug\net10.0-windows\games\latest_ae98e5f0-6d64-465b-ba5a-3ab7ec1fd178</GamePath>
+	<GameAssembliesPath>$(GamePath)\MiSide Zero_Data\Managed</GameAssembliesPath>
 	<MelonAssembliesPath>$(GamePath)\MelonLoader\net6</MelonAssembliesPath>
   </PropertyGroup>
 </Project>

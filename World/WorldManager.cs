@@ -1,4 +1,5 @@
-﻿using mszcubemod.Rendering;
+﻿using MelonLoader;
+using mszcubemod.Rendering;
 using UnityEngine;
 
 namespace mszcubemod.World
@@ -32,7 +33,11 @@ namespace mszcubemod.World
 
         public void DeleteBlock(Vector3 position)
         {
-            if (!placedBlocks.Remove(position, out PlacedBlock? placed)) return;
+            if (!placedBlocks.TryGetValue(position, out PlacedBlock placed))
+            {
+                MelonLogger.Warning($"Attempted to delete non-existant block at {position}!");
+            }
+            placedBlocks.Remove(position);
             GameObject.Destroy(placed.Object);
         }
 

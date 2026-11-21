@@ -38,8 +38,7 @@ namespace mszcubemod
             if (!_previewMode)
             {
                 BoxCollider? collider = ghostCube.GetComponent<BoxCollider>();
-                if (collider != null)
-                    collider.enabled = false;
+                collider?.enabled = false;
             }
         }
 
